@@ -47,6 +47,13 @@
       width: 122px;
     }
   </style>
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "2ec197e6279d49bda7ef4950fbabf691",
+      application: "lab9"
+    });
+  </script> 
 </head>
 
 <body>
@@ -84,24 +91,107 @@
       <button>End Timer</button>
       <button>Console Trace</button>
       <button>Trigger a Global Error</button>
+
     </section>
   </main>
 
   <script>
     let form = document.querySelector('form');
+    class InputValidationError extends Error{
+      constructor(message){
+        super(message);
+        this.name = 'InputValidationError';
+      }
+    }
     form.addEventListener('submit', e => {
       e.preventDefault();
-      let output = document.querySelector('output');
-      let firstNum = document.querySelector('#first-num').value;
-      let secondNum = document.querySelector('#second-num').value;
-      let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      const output = document.querySelector('output');
+      const firstNum = document.querySelector('#first-num').value;
+      const secondNum = document.querySelector('#second-num').value;
+      const operator = document.querySelector('#operator').value;
+
+      try {
+        if (operator === '/' && Number(secondNum) === 0) {
+          throw new InputValidationError("Division by zero is not allowed");
+        }
+        if (firstNum === '' || secondNum === '') {
+          throw new InputValidationError("Both input fields are required");
+        }
+        if (isNaN(firstNum) || isNaN(secondNum)) {
+          throw new InputValidationError("Inputs must be valid integers");
+        }
+        let result = eval(`${firstNum} ${operator} ${secondNum}`);
+
+        output.innerHTML = result;
+      } catch (err) {
+        console.log("something is wrong my friend");
+        console.error(err);
+      } finally {
+        console.log("Calculation attempt completed.");
+      }
     });
-
-    let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
-
+     
     // Start your code here
     // You may move this JS to another file if you wish
+
+    document.addEventListener('DOMContentLoaded', () =>{
+      const buttons = document.querySelectorAll('#error-btns button');
+
+      buttons[0].addEventListener('click', () => console.log('Console Log Demo'));
+      buttons[1].addEventListener('click', () => console.error('Console Error Demo'));
+      buttons[2].addEventListener('click', () => console.count('Count Button'));
+      buttons[3].addEventListener('click', () => console.warn('Console Warn Button'));
+      buttons[4].addEventListener('click', () => {
+        const obj = { number: 4, errorMsg: 'The number does not equal 3' };
+        if (obj.number !== 3) {
+          console.error("Assertion failed:\n", obj);
+        }
+      });
+      buttons[5].addEventListener('click', () => console.clear());
+      buttons[6].addEventListener('click', () => {
+        console.dir(document.createElement('button'));
+      });
+      buttons[7].addEventListener('click', () => {
+        const tempButton = document.createElement('button');
+        tempButton.textContent = 'Console dirxml';
+        console.dirxml(tempButton);
+      });
+      buttons[8].addEventListener('click', () => {
+        console.group("console.group");
+      });
+      buttons[9].addEventListener('click', () => {
+        console.groupEnd();
+      });
+      buttons[10].addEventListener('click', () => {
+        const courses = [
+          { name: 'Software Engineering', num: 142 },
+          { name: 'Programming Languages', num: 123 },
+          { name: 'Advanced Software', num: 171 }
+        ];
+        console.table(courses);
+      });
+      buttons[11].addEventListener('click', () => console.time('Timer Button'));
+      buttons[12].addEventListener('click', () => console.timeEnd('Timer Button'));
+      buttons[13].addEventListener('click', function handleBtnClick() {
+        function deepest() { console.trace('console.trace'); }
+        function deeper() { deepest(); }
+        function deep() { deeper(); }
+        deep();
+      });
+      buttons[14].addEventListener('click', function handleBtnClick() {
+        throw new SyntaxError("Invalid or unexpected token");
+      });
+
+    });
+    window.onerror = function (message, source, lineno, colno, error) {
+      console.log("something is wrong my friend");
+      
+      if (error) {
+        console.error(`${source}:${lineno} ${error.name}: ${error.message}`);
+      } else {
+        console.error(`${source}:${lineno} Error: ${message}`);
+      }
+    };
   </script>
 </body>
 
