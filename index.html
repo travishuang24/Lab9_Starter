@@ -121,7 +121,6 @@
           throw new InputValidationError("Inputs must be valid integers");
         }
         let result = eval(`${firstNum} ${operator} ${secondNum}`);
-
         output.innerHTML = result;
       } catch (err) {
         console.log("something is wrong my friend");
@@ -185,7 +184,6 @@
     });
     window.onerror = function (message, source, lineno, colno, error) {
       console.log("something is wrong my friend");
-      
       if (error) {
         console.error(`${source}:${lineno} ${error.name}: ${error.message}`);
       } else {
